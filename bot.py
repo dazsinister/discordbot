@@ -1,42 +1,34 @@
-import discord
-from discord.ext import commands
-
+#imports
+import nextcord
+from nextcord import Interaction
+from nextcord.ext import commands
+import os
 from apikey import *
 
-intents = discord.Intents.default()
+#permissions for discord bot to work
+intents = nextcord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix='!', intents=intents)
+client = commands.Bot(command_prefix= '!', intents=intents)
 
-
+#printing out that the bot is ready to go if successful
 @client.event
 async def on_ready():
+    await client.change_presence(status= nextcord.Status.idle, activity=nextcord.Game('Running life'))
     print("The bot is now ready for use!")
     print("-----------------")
 
-@client.command()
-async def hello(ctx):
-    await ctx.send("Hello, I am the Comic bot how can I help you?")
+#importing all the cogs into the bot
+initial_extensions = []
 
-@client.command()
-async def goodbye(ctx):
-    await ctx.send("Goodbye, hope you have a good rest of the day")
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        initial_extensions.append("cogs." + filename[:-3])
 
+#for loop
+if __name__=='__main__':
+    for extension in initial_extensions:
+        client.load_extension(extension)
 
-async def help(ctx):
-    await ctx.send("Avialble commands are as followed,"
-                  "/!help",
-                  "/!hello",
-                  "/!goodbye")
-
-@client.event
-async def on_member_join(member):
-    channel = client.get_channel(442444744464007190)
-    await channel.send("Welcome to ShotPVP!")
-
-@client.event
-async def on_memeber_remove(member):
-    channel = client.get_channel(442444744464007190)
-    await channel.send("Goodbye, you will be missed")
-
+#run with token
 client.run(TOKEN)
